@@ -588,7 +588,7 @@ public class F1Data {
 		this.newField28 = newField28;
 	}
 
-	public void updateDataWithDoubleArray(double[] arrayOfDouble)
+	public F1Data(double[] arrayOfDouble)
 	{
 
 		setTime(arrayOfDouble[0]);
@@ -656,7 +656,7 @@ public class F1Data {
 		setPreviousLapTime(arrayOfDouble[61]);
 		setNewField26(arrayOfDouble[62]);
 		setNewField27(arrayOfDouble[63]);
-		setNewField28(arrayOfDouble[64]);	
+		//setNewField28(arrayOfDouble[64]);	
 	}
 	
 	public void updateDataWithConsoleExit(double[] arrayOfDouble)

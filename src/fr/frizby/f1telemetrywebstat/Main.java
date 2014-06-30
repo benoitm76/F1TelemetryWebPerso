@@ -12,6 +12,9 @@ public class Main {
 	private boolean closureInProgress = false; 
 	private F1Data curData;
 	
+	private Lap lastLap = null;
+	private Lap curLap = null;
+	
 	public static void main(String[] args) {
 		new Main();
 	}
@@ -39,6 +42,12 @@ public class Main {
 
 		byte[] arrayOfByte = new byte[256];
 		try {
+			if(lastLap == null && curLap == null)
+			{
+				curLap = new Lap();
+			}
+			
+			
 			localDatagramSocket = new DatagramSocket(20777);
 			System.out.println("Ok");
 			// Infinity loop

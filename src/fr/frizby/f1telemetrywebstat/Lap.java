@@ -23,5 +23,21 @@ public class Lap {
 	{
 		lapInfo.add(d);
 	}
+	
+	public void removeLapInfoFromTime(double lapTime)
+	{
+		int i = 0;
+		for(F1Data d : lapInfo)
+		{
+			if(d.getLapTime() >= lapTime)
+			{
+				lapInfo.remove(i);
+			}
+			else
+			{
+				i++;
+			}
+		}
+	}
 
 }

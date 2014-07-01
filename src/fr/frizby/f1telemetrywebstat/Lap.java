@@ -3,13 +3,14 @@ package fr.frizby.f1telemetrywebstat;
 import java.util.ArrayList;
 
 import fr.frizby.f1telemetrywebstat.Utils.F1Data;
+import fr.frizby.f1telemetrywebstat.Utils.MySQLDB;
 
 public class Lap implements Cloneable {
 	private ArrayList<F1Data> lapInfo;
-	private double averageSpeed;
-	private double fuelConsuption;
-	private double kersConsuption;
-	private double drsTime;
+	private double averageSpeed = 0;
+	private double fuelConsuption = 0;
+	private double kersConsuption = 0;
+	private double drsTime = 0;
 	
 	
 	public ArrayList<F1Data> getLapInfo() {
@@ -72,6 +73,24 @@ public class Lap implements Cloneable {
 		}
 	}
 	
+	public boolean sendData()
+	{
+		MySQLDB cnx = new MySQLDB();
+		
+		ArrayList<Double> arg = new ArrayList<Double>();
+		arg.add(this.averageSpeed);
+		arg.add(this.fuelConsuption);
+		arg.add(this.kersConsuption);
+		arg.add(this.drsTime);
+		if(cnx.createLap(arg) != 0)
+		{
+			System.out.println("TRUE");
+			return true;
+		}
+		else
+			return false;
+	}
+	
 	public Lap clone()
 	{
 		Lap lap = null;
@@ -86,11 +105,9 @@ public class Lap implements Cloneable {
 	public String toString()
 	{
 		String output = "";
-		int lap = 0;
 		for(F1Data d : getLapInfo())
 		{
-			output += "\n\nLap : " + lap
-					+ "\nTime : " + d.getTime()
+			output += "\nTime : " + d.getTime()
 					+ "\nLapTime : " + d.getLapTime()
 					+ "\nLapDistance : " + d.getLapDistance()
 					+ "\nDistance : " + d.getDistance()
@@ -155,7 +172,6 @@ public class Lap implements Cloneable {
 					+ "\nNewField26 : " + d.getNewField26()
 					+ "\nNewField27 : " + d.getNewField27();
 					//+ "\nNewField28 : " + d.getNewField28();
-			lap++;
 		}
 		return output;
 	}

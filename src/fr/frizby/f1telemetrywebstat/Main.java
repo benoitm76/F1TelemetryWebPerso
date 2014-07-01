@@ -74,6 +74,7 @@ public class Main {
 							//TODO Send lastLap;
 							if(!lastLap.getLapInfo().isEmpty())
 							{
+								lastLap.sendData();
 								F1Data finalInfos = lastLap.getLapInfo().get(lastLap.getLapInfo().size() -1);
 								System.out.println("Lap :" + finalInfos.getLap() + " : " + finalInfos.getLapTime() + " seconds");
 							}

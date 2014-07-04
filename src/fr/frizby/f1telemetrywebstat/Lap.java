@@ -59,16 +59,12 @@ public class Lap implements Cloneable {
 	
 	public void removeLapInfoFromTime(double lapTime)
 	{
-		int i = 0;
-		for(F1Data d : lapInfo)
+		int length = lapInfo.size() - 1;
+		for(int i = length; i > 0; i--)
 		{
-			if(d.getLapTime() >= lapTime)
+			if(lapInfo.get(i).getLapTime() > lapTime)
 			{
 				lapInfo.remove(i);
-			}
-			else
-			{
-				i++;
 			}
 		}
 	}
@@ -78,13 +74,20 @@ public class Lap implements Cloneable {
 		MySQLDB cnx = new MySQLDB();
 		
 		ArrayList<Double> arg = new ArrayList<Double>();
-		arg.add(this.averageSpeed);
-		arg.add(this.fuelConsuption);
-		arg.add(this.kersConsuption);
-		arg.add(this.drsTime);
-		if(cnx.createLap(arg) != 0)
+		arg.add(averageSpeed);
+		arg.add(fuelConsuption);
+		arg.add(kersConsuption);
+		arg.add(drsTime);
+		int lapId = cnx.createLap(arg);
+		if(lapId != 0)
 		{
-			System.out.println("TRUE");
+			for(F1Data d : lapInfo)
+			{
+				cnx.addLapInfo(lapId, d);
+				averageSpeed += d.getSpeed();
+			}
+			averageSpeed = averageSpeed / lapInfo.size();
+			System.out.println("AverageSpeed = " + averageSpeed);
 			return true;
 		}
 		else

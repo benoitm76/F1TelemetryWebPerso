@@ -63,6 +63,7 @@ public class Main {
 										
 					if(curLap.getLapInfo().isEmpty())
 					{
+						System.out.println("No data there, adding first data...");
 						curLap.getLapInfo().add(curData);
 					}
 					else
@@ -71,22 +72,35 @@ public class Main {
 						
 						if(curData.getLap() > lastLapInfo.getLap() && curData.getLapTime() < lastLapInfo.getLapTime())
 						{
-							//TODO Send lastLap;
+
+							System.out.print("Detecting new lap, ");
+							
 							if(!lastLap.getLapInfo().isEmpty())
 							{
+								System.out.print("sending lastLap info, ");
+								
 								lastLap.sendData();
-								F1Data finalInfos = lastLap.getLapInfo().get(lastLap.getLapInfo().size() -1);
-								System.out.println("Lap :" + finalInfos.getLap() + " : " + finalInfos.getLapTime() + " seconds");
 							}
-							lastLap = curLap.clone();
+							System.out.println("saving this lap, creating the new one...");
+							if(curLap.getLapInfo().get(0).getLapTime() < 1.0)
+							{
+								lastLap = curLap.clone();
+							}
 							curLap = new Lap();
 						}
-
-						if(curData.getLap() < lastLapInfo.getLap() && curData.getLapTime() > lastLapInfo.getLapTime())
+						else if(curData.getLap() < lastLapInfo.getLap() && curData.getLapTime() > lastLapInfo.getLapTime())
 						{
+							System.out.println("Rewind to the past lap, delete data from this point...");
+							
 							lastLap.removeLapInfoFromTime(lastLapInfo.getTime());
 							curLap = lastLap;
 							lastLap = new Lap();
+						}
+						else if(curData.getLapTime() < lastLapInfo.getLapTime())
+						{
+							System.out.println("Rewind during the lap, delete data from this point...");
+							
+							curLap.removeLapInfoFromTime(curData.getLapTime());
 						}
 						
 						curLap.getLapInfo().add(curData);

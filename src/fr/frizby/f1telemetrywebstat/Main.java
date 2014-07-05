@@ -69,41 +69,44 @@ public class Main {
 					else
 					{
 						lastLapInfo = curLap.getLapInfo().get(curLap.getLapInfo().size() - 1);
-						
-						if(curData.getLap() > lastLapInfo.getLap() && curData.getLapTime() < lastLapInfo.getLapTime())
+						Double dif = curData.getLapTime() - lastLapInfo.getLapTime();
+						if(dif >= 0.001 || dif <= -0.001)
 						{
-
-							System.out.print("Detecting new lap, ");
-							
-							if(!lastLap.getLapInfo().isEmpty())
+							if(curData.getLap() > lastLapInfo.getLap() && curData.getLapTime() < lastLapInfo.getLapTime())
 							{
-								System.out.print("sending lastLap info, ");
+	
+								System.out.print("Detecting new lap, ");
 								
-								lastLap.sendData();
+								if(!lastLap.getLapInfo().isEmpty())
+								{
+									System.out.print("sending lastLap info, ");
+									
+									lastLap.sendData();
+								}
+								System.out.println("saving this lap, creating the new one...");
+								if(curLap.getLapInfo().get(0).getLapTime() < 1.0)
+								{
+									lastLap = curLap.clone();
+								}
+								curLap = new Lap();
 							}
-							System.out.println("saving this lap, creating the new one...");
-							if(curLap.getLapInfo().get(0).getLapTime() < 1.0)
+							else if(curData.getLap() < lastLapInfo.getLap() && curData.getLapTime() > lastLapInfo.getLapTime())
 							{
-								lastLap = curLap.clone();
+								System.out.println("Rewind to the past lap, delete data from this point...");
+								
+								lastLap.removeLapInfoFromTime(lastLapInfo.getTime());
+								curLap = lastLap;
+								lastLap = new Lap();
 							}
-							curLap = new Lap();
-						}
-						else if(curData.getLap() < lastLapInfo.getLap() && curData.getLapTime() > lastLapInfo.getLapTime())
-						{
-							System.out.println("Rewind to the past lap, delete data from this point...");
+							else if(curData.getLapTime() < lastLapInfo.getLapTime())
+							{
+								System.out.println("Rewind during the lap, delete data from this point...");
+								
+								curLap.removeLapInfoFromTime(curData.getLapTime());
+							}
 							
-							lastLap.removeLapInfoFromTime(lastLapInfo.getTime());
-							curLap = lastLap;
-							lastLap = new Lap();
+							curLap.getLapInfo().add(curData);
 						}
-						else if(curData.getLapTime() < lastLapInfo.getLapTime())
-						{
-							System.out.println("Rewind during the lap, delete data from this point...");
-							
-							curLap.removeLapInfoFromTime(curData.getLapTime());
-						}
-						
-						curLap.getLapInfo().add(curData);
 					}
 					
 				} catch (Exception e) {

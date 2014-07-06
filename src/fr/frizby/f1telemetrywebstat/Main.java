@@ -42,7 +42,7 @@ public class Main {
 
 		byte[] arrayOfByte = new byte[256];
 		try {
-			localDatagramSocket = new DatagramSocket(20777);
+			localDatagramSocket = new DatagramSocket(20776);
 			System.out.println("Ok");
 			// Infinity loop
 			while (true) {

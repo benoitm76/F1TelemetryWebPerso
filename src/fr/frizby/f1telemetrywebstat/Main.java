@@ -3,9 +3,11 @@ package fr.frizby.f1telemetrywebstat;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import fr.frizby.f1telemetrywebstat.Utils.F1Data;
+import fr.frizby.f1telemetrywebstat.Utils.Log;
 import fr.frizby.f1telemetrywebstat.Utils.Utils;
 
 public class Main {
@@ -15,17 +17,18 @@ public class Main {
 	
 	private Lap lastLap = new Lap();
 	private Lap curLap = new Lap();
-	private F1Data lastLapInfo;
+	private F1Data lastLapInfo;	
 	
 	public static void main(String[] args) {
+		Log.getInstance();
 		new Main();
 	}
 	
 	public Main() {
-		System.out.println("Application startup : F1 Telemetry");
-		System.out.println("Version : " + getClass().getPackage().getImplementationVersion());
-		System.out.println("Author : Vincent DRON");
-		System.out.println("Based on : F1TelemetryOnRpi from Benoit MOUQUET (https://github.com/benoitm76/F1TelemetryOnRpi)");
+		Log.c("Application startup : F1 Telemetry");
+		Log.c("Version : " + getClass().getPackage().getImplementationVersion());
+		Log.c("Author : Vincent DRON");
+		Log.c("Based on : F1TelemetryOnRpi from Benoit MOUQUET (https://github.com/benoitm76/F1TelemetryOnRpi)");
 
 		// Execute when leave application (ctrl + c)
 		Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -42,8 +45,8 @@ public class Main {
 
 		byte[] arrayOfByte = new byte[256];
 		try {
-			localDatagramSocket = new DatagramSocket(20776);
-			System.out.println("Ok");
+			localDatagramSocket = new DatagramSocket(20777);
+			Log.i("Ready for receiving packets...");
 			// Infinity loop
 			while (true) {
 				DatagramPacket localDatagramPacket = new DatagramPacket(
@@ -63,27 +66,28 @@ public class Main {
 										
 					if(curLap.getLapInfo().isEmpty())
 					{
-						System.out.println("No data there, adding first data...");
+						Log.i("No data there, adding first data...");
 						curLap.getLapInfo().add(curData);
 					}
 					else
 					{
 						lastLapInfo = curLap.getLapInfo().get(curLap.getLapInfo().size() - 1);
-						Double dif = curData.getLapTime() - lastLapInfo.getLapTime();
+						double dif = curData.getTime() - lastLapInfo.getTime();
+
 						if(dif >= 0.001 || dif <= -0.001)
 						{
 							if(curData.getLap() > lastLapInfo.getLap() && curData.getLapTime() < lastLapInfo.getLapTime())
 							{
 	
-								System.out.print("Detecting new lap, ");
+								Log.i("Detecting new lap, ");
 								
 								if(!lastLap.getLapInfo().isEmpty())
 								{
-									System.out.print("sending lastLap info, ");
+									Log.i("sending lastLap info, ");
 									
 									lastLap.sendData();
 								}
-								System.out.println("saving this lap, creating the new one...");
+								Log.i("saving this lap, creating the new one...");
 								if(curLap.getLapInfo().get(0).getLapTime() < 1.0)
 								{
 									lastLap = curLap.clone();
@@ -92,7 +96,7 @@ public class Main {
 							}
 							else if(curData.getLap() < lastLapInfo.getLap() && curData.getLapTime() > lastLapInfo.getLapTime())
 							{
-								System.out.println("Rewind to the past lap, delete data from this point...");
+								Log.e("Rewind to the past lap, delete data from this point...");
 								
 								lastLap.removeLapInfoFromTime(lastLapInfo.getTime());
 								curLap = lastLap;
@@ -100,7 +104,7 @@ public class Main {
 							}
 							else if(curData.getLapTime() < lastLapInfo.getLapTime())
 							{
-								System.out.println("Rewind during the lap, delete data from this point...");
+								Log.e("Rewind during the lap, delete data from this point...");
 								
 								curLap.removeLapInfoFromTime(curData.getLapTime());
 							}
@@ -113,14 +117,13 @@ public class Main {
 					// Display error message only if we not leave the
 					// application
 					if (!closureInProgress) {
-						e.printStackTrace();
+						Log.wtf(e.getMessage());
 					}
 				}
 			}
 
 		} catch (SocketException localSocketException1) {
-			System.err
-					.println("Cannot create socket. Are you trying to run two instances listening to the same port?");
+			Log.wtf("Cannot create socket. Are you trying to run two instances listening to the same port?");
 			System.exit(1);
 		}
 	}

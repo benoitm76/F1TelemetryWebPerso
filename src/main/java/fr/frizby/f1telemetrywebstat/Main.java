@@ -3,8 +3,6 @@ package fr.frizby.f1telemetrywebstat;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.util.Date;
-import java.util.logging.Logger;
 
 import fr.frizby.f1telemetrywebstat.Utils.F1Data;
 import fr.frizby.f1telemetrywebstat.Utils.Log;
